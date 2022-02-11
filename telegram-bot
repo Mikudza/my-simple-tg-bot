@@ -1,21 +1,30 @@
 #!/usr/bin/env bash
 
 #This script will check if our service with bot is runnig
-#If not, it will try "N" attemps to restart service
-#if 3 attemps will fail, it run another python script that will massege about attemptions fail
-#also we will write our faled attemptions in log file
-#before running our cicle we eil ckeck if we dont tryin restart service at last "X" min
+#If not, it will try "N" attempts to restart service
+#if "N" attempts will fail, it run another python script that will message about attemptions fail
+#also we will write our failed attemptions in log file
+#before running our cicle we check if we dont tryin restart service at last "X" min
 
-attemps=3
+attempts=3
+i=0
 last_x_min=5
 service=$@
 /bin/systemctl -q is-active "$service.service"
 status=$?
-while [ $attemps -gt 0 ]; do
+while [ $i -lt $attempts ]; do
   if [ "$status" == 0 ]; then
       break
   else
       /bin/systemctl start "$service.service"
   fi
-  attemps=$[ $attemps - 1 ]
+  /bin/systemctl -q is-active "$service.service"
+  status_after=$?
+  if [ "$status_after" == 0 ] || [ "$status_after" == 3 ] ; then
+    true
+  else
+    echo "$(date +"%y-%m-%d %T") restart failed" >> logfile.txt
+  fi
+  i=$((i+1))
+  sleep 10
  done
