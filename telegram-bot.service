@@ -1,0 +1,13 @@
+# replace this file to /lib/systemd/system/
+[Unit]
+Description=Telegram bot
+After=multi-user.target
+Conflicts=getty@tty1.service
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/python3 /home/root/my-simple-tg-bot/main.py #Write path to your python script
+StandardInput=tty-force
+
+[Install]
+WantedBy=multi-user.target
